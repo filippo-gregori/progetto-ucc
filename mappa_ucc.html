@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rete Stazioni UCC - Underground Climate Change</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Info panel */
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 350px;
+            transition: all 0.3s ease;
+        }
+
+        .info-panel h2 {
+            margin: 0 0 5px 0;
+            color: #0066cc;
+            font-size: 18px;
+        }
+
+        .info-panel h3 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .info-panel p {
+            margin: 8px 0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        /* Toggle button */
+        .toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 1001;
+            display: none;
+        }
+
+        .toggle-btn:hover {
+            background: #f0f0f0;
+        }
+
+        /* Logo */
+        .logo {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .logo img {
+            height: 60px;
+            display: block;
+        }
+
+        /* Popup styling */
+        .ucc-popup {
+            max-width: 400px;
+            font-size: 12px;
+        }
+
+        .ucc-popup h4 {
+            margin: 0 0 10px 0;
+            color: #0066cc;
+            font-size: 16px;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 5px;
+        }
+
+        .ucc-popup table {
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .ucc-popup td {
+            padding: 4px 6px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .ucc-popup td:first-child {
+            font-weight: bold;
+            width: 45%;
+            color: #555;
+        }
+
+        .ucc-popup .section-title {
+            background-color: #e6f2ff;
+            font-weight: bold;
+            padding: 6px;
+            margin-top: 8px;
+            color: #0066cc;
+        }
+
+        /* Custom marker */
+        .ucc-marker {
+            background: #0066cc;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 10px;
+            color: white;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 2000;
+            font-size: 16px;
+            display: none;
+        }
+
+        #loading.show {
+            display: block;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .info-panel {
+                max-width: calc(100vw - 70px);
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .info-panel.collapsed {
+                transform: translateX(calc(100% + 20px));
+            }
+
+            .info-panel.expanded {
+                transform: translateX(0);
+            }
+
+            .toggle-btn {
+                display: block;
+            }
+
+            .info-panel h2 {
+                font-size: 16px;
+            }
+
+            .info-panel h3 {
+                font-size: 12px;
+            }
+
+            .info-panel p {
+                font-size: 11px;
+            }
+
+            .logo img {
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="loading">Caricamento stazioni in corso...</div>
+
+    <button class="toggle-btn" id="toggle-info">ℹ️</button>
+
+    <div class="info-panel" id="info-panel">
+        <h2>Underground Climate Change</h2>
+        <h3>Rete nazionale di monitoraggio microclimatico in grotta</h3>
+        <hr style="margin: 10px 0; border: none; border-top: 1px solid #ddd;">
+        <p id="station-count" style="font-weight: bold; color: #0066cc;">Totale stazioni: 18</p>
+        <p style="font-size: 11px; color: #666;">
+            Clicca sui marker per visualizzare i dettagli delle stazioni
+        </p>
+    </div>
+
+    <div class="logo">
+        <img src="ucc2.png" alt="UCC Logo">
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Dati stazioni inclusi -->
+    <script src="ucc_data.js"></script>
+
+    <script>
+        // Aspetta che le librerie siano caricate
+        window.addEventListener('load', function() {
+            setTimeout(initMap, 300);
+        });
+
+        function initMap() {
+            try {
+                // Inizializza mappa centrata sull'Italia
+                var map = L.map('map').setView([43.5, 11.5], 6);
+
+                // Base layers
+                var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                var satelliteLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                    attribution: '© Google',
+                    maxZoom: 20
+                });
+
+                // Layer control
+                L.control.layers({
+                    "Mappa stradale": osmLayer,
+                    "Satellite": satelliteLayer
+                }, null, {position: 'topright'}).addTo(map);
+
+                // Funzioni helper
+                function formatValue(val) {
+                    return (val !== null && val !== undefined && val !== '') ? val : '—';
+                }
+
+                // Carica dati stazioni
+                var data = uccData;
+                var stationCount = data.features.length;
+
+                document.getElementById('station-count').textContent =
+                    'Totale stazioni: ' + stationCount;
+
+                // Aggiungi marker per ogni stazione
+                data.features.forEach(function(f) {
+                    var p = f.properties;
+                    var coords = f.geometry.coordinates;
+
+                    try {
+                        var latLng = [coords[1], coords[0]]; // GeoJSON è [lon, lat], Leaflet è [lat, lon]
+
+                        // Estrai codice stazione (es: CAM-01)
+                        var stationCode = p['stazione UCC'] || '';
+
+                        // Crea icona personalizzata
+                        var icon = L.divIcon({
+                            className: 'ucc-marker-container',
+                            html: '<div class="ucc-marker">' + stationCode.split('-')[0] + '</div>',
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16],
+                            popupAnchor: [0, -16]
+                        });
+
+                        // Crea popup
+                        var popup = '<div class="ucc-popup">' +
+                            '<h4>' + formatValue(p['nome grotta']) + '</h4>' +
+                            '<table>' +
+                            '<tr><td colspan="2" class="section-title">🏔️ IDENTIFICAZIONE</td></tr>' +
+                            '<tr><td>Stazione UCC:</td><td><strong>' + formatValue(p['stazione UCC']) + '</strong></td></tr>' +
+                            '<tr><td>Numero Catasto:</td><td>' + formatValue(p['num. Catasto']) + '</td></tr>' +
+                            '<tr><td colspan="2" class="section-title">📍 LOCALIZZAZIONE</td></tr>' +
+                            '<tr><td>Area Geografica:</td><td>' + formatValue(p['area geografica']) + '</td></tr>' +
+                            '<tr><td>Comune:</td><td>' + formatValue(p['comune']) + '</td></tr>' +
+                            '<tr><td>Coordinate:</td><td>' + coords[1].toFixed(5) + '°N, ' + coords[0].toFixed(5) + '°E</td></tr>' +
+                            '<tr><td>Quota Ingresso:</td><td>' + formatValue(p['quota ingresso [m s.l.m]']) + ' m s.l.m.</td></tr>' +
+                            '<tr><td>Quota Stazione:</td><td>' + formatValue(p['quota stazione UCC [m s.l.m]']) + ' m s.l.m.</td></tr>' +
+                            '<tr><td colspan="2" class="section-title">📏 CARATTERISTICHE</td></tr>' +
+                            '<tr><td>Distanza da ingresso:</td><td>' + formatValue(p['distanza da ingresso']) + '</td></tr>' +
+                            '<tr><td>Distanza da superficie:</td><td>' + formatValue(p['distanza da superficie']) + '</td></tr>' +
+                            '<tr><td colspan="2" class="section-title">🌡️ SENSORI</td></tr>' +
+                            '<tr><td>T aria:</td><td>' + formatValue(p['sensori T aria']) + '</td></tr>' +
+                            '<tr><td>T roccia:</td><td>' + formatValue(p['sensori T roccia']) + '</td></tr>' +
+                            '<tr><td>T acqua:</td><td>' + formatValue(p['sensori T acqua']) + '</td></tr>' +
+                            '<tr><td>Altri parametri:</td><td>' + formatValue(p['altri parametri misurati']) + '</td></tr>' +
+                            '<tr><td colspan="2" class="section-title">👥 MONITORAGGIO</td></tr>' +
+                            '<tr><td>Inizio monitoraggio:</td><td><strong>' + formatValue(p['anno inizio monitoraggio']) + '</strong></td></tr>' +
+                            '<tr><td>Collaborazioni:</td><td>' + formatValue(p['collaborazioni']) + '</td></tr>' +
+                            '</table>' +
+                            '</div>';
+
+                        // Crea marker
+                        var marker = L.marker(latLng, {icon: icon});
+                        marker.bindPopup(popup);
+                        marker.addTo(map);
+
+                    } catch (e) {
+                        console.error('Errore processamento stazione:', e);
+                    }
+                });
+
+                // Toggle panel per mobile
+                var isMobile = window.innerWidth <= 768;
+                var infoPanel = document.getElementById('info-panel');
+                var toggleInfo = document.getElementById('toggle-info');
+
+                if (isMobile) {
+                    infoPanel.classList.add('collapsed');
+                }
+
+                toggleInfo.addEventListener('click', function() {
+                    if (infoPanel.classList.contains('expanded') || (!isMobile && !infoPanel.classList.contains('collapsed'))) {
+                        infoPanel.classList.remove('expanded');
+                        infoPanel.classList.add('collapsed');
+                        toggleInfo.innerHTML = 'ℹ️';
+                    } else {
+                        infoPanel.classList.remove('collapsed');
+                        infoPanel.classList.add('expanded');
+                        toggleInfo.innerHTML = '✖️';
+                    }
+                });
+
+                console.log('Caricate ' + stationCount + ' stazioni UCC');
+
+            } catch (e) {
+                document.getElementById('station-count').textContent = 'Errore: ' + e.message;
+                document.getElementById('loading').textContent = 'Errore: ' + e.message;
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+</html>
