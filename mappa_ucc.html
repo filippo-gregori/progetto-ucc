@@ -236,11 +236,11 @@
                     maxZoom: 20
                 });
 
-                // Layer control
+                // Layer control (in alto a sinistra per non sovrapporsi all'info panel)
                 L.control.layers({
                     "Mappa stradale": osmLayer,
                     "Satellite": satelliteLayer
-                }, null, {position: 'topright'}).addTo(map);
+                }, null, {position: 'topleft'}).addTo(map);
 
                 // Funzioni helper
                 function formatValue(val) {
