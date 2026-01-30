@@ -93,16 +93,16 @@ var uccData = {
       "geometry": {
         "type": "Point",
         "coordinates": [
-          12.50666,
-          42.23597
+          12.50824,
+          42.23651
         ]
       },
       "properties": {
         "stazione UCC": "LAZ-01",
         "nome grotta": "Bunker Soratte",
         "num. Catasto": "NC",
-        "Long. E": "12,50666",
-        "Lat. N": "42,23597",
+        "Long. E": "12,50824",
+        "Lat. N": "42,23651",
         "area geografica": "Monte Soratte",
         "comune": "Sant'Oreste",
         "quota ingresso [m s.l.m]": "425",
