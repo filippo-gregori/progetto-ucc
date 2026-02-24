@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC Stations Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        .popup-content h3 {
+            margin: 0 0 10px 0;
+            color: #2c5282;
+            font-size: 16px;
+            border-bottom: 2px solid #2c5282;
+            padding-bottom: 5px;
+        }
+        .popup-content table {
+            width: 100%;
+            font-size: 13px;
+        }
+        .popup-content tr {
+            border-bottom: 1px solid #eee;
+        }
+        .popup-content td {
+            padding: 4px 2px;
+        }
+        .popup-content td:first-child {
+            font-weight: bold;
+            color: #555;
+            width: 50%;
+        }
+        .popup-content td:last-child {
+            color: #333;
+        }
+        .pdf-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: #2c5282;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .pdf-link:hover {
+            background: #1a365d;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        var map = L.map('map').setView([43.0, 12.0], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Simple translation map for known Italian parameter values
+        var paramTranslations = {
+            'umidità': 'humidity',
+            'umidita': 'humidity'
+        };
+
+        function translateParam(value) {
+            if (!value) return value;
+            var lower = value.toLowerCase().trim();
+            return paramTranslations[lower] || value;
+        }
+
+        function createPopup(properties) {
+            var html = '<div class="popup-content">';
+            html += '<h3>' + properties['nome grotta'] + '</h3>';
+            html += '<table>';
+            html += '<tr><td>Station:</td><td>' + properties['stazione UCC'] + '</td></tr>';
+            html += '<tr><td>Cadastral no.:</td><td>' + properties['num. Catasto'] + '</td></tr>';
+            html += '<tr><td>Area:</td><td>' + properties['area geografica'] + '</td></tr>';
+            html += '<tr><td>Municipality:</td><td>' + properties['comune'] + '</td></tr>';
+            html += '<tr><td>Entrance elevation:</td><td>' + properties['quota ingresso [m s.l.m]'] + ' m a.s.l.</td></tr>';
+
+            if (properties['quota stazione UCC [m s.l.m]']) {
+                html += '<tr><td>Station elevation:</td><td>' + properties['quota stazione UCC [m s.l.m]'] + ' m a.s.l.</td></tr>';
+            }
+            if (properties['distanza da ingresso']) {
+                html += '<tr><td>Distance from entrance:</td><td>' + properties['distanza da ingresso'] + ' m</td></tr>';
+            }
+            if (properties['distanza da superficie']) {
+                html += '<tr><td>Distance from surface:</td><td>' + properties['distanza da superficie'] + ' m</td></tr>';
+            }
+
+            html += '<tr><td>Air T sensors:</td><td>' + properties['sensori T aria'] + '</td></tr>';
+
+            if (properties['sensori T roccia']) {
+                html += '<tr><td>Rock T sensors:</td><td>' + properties['sensori T roccia'] + '</td></tr>';
+            }
+            if (properties['sensori T acqua']) {
+                html += '<tr><td>Water T sensors:</td><td>' + properties['sensori T acqua'] + '</td></tr>';
+            }
+            if (properties['altri parametri misurati']) {
+                html += '<tr><td>Other parameters:</td><td>' + translateParam(properties['altri parametri misurati']) + '</td></tr>';
+            }
+
+            html += '<tr><td>Monitoring start:</td><td>' + properties['anno inizio monitoraggio'] + '</td></tr>';
+            html += '<tr><td>Collaborators:</td><td>' + properties['collaborazioni'] + '</td></tr>';
+            html += '</table>';
+
+            // To add PDF links, uncomment and customize this line:
+            // html += '<a href="pdf/' + properties['stazione UCC'] + '.pdf" class="pdf-link" target="_blank">Download PDF sheet</a>';
+
+            html += '</div>';
+            return html;
+        }
+
+        var stazioni = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[15.45527,40.53633]},"properties":{"stazione UCC":"CAM-01","nome grotta":"Grotta di Pertosa-Auletta","num. Catasto":"Cp-0001","area geografica":"Monti Alburni","comune":"Pertosa","quota ingresso [m s.l.m]":280,"quota stazione UCC [m s.l.m]":null,"distanza da ingresso":null,"distanza da superficie":null,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2026,"collaborazioni":"Grotte di Pertosa / Fondazione MiDA"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[15.41139,40.47787]},"properties":{"stazione UCC":"CAM-02","nome grotta":"Grava II dei Campitelli","num. Catasto":"Cp-0107","area geografica":"Monti Alburni","comune":"Corleto Monforte","quota ingresso [m s.l.m]":1099,"quota stazione UCC [m s.l.m]":1010.0,"distanza da ingresso":350.0,"distanza da superficie":80.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2025,"collaborazioni":"Federazione Speleologica Campana"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[13.65443,45.76596]},"properties":{"stazione UCC":"FVG-01","nome grotta":"Grotta delle Torri si Slivia","num. Catasto":"FVG-0022","area geografica":"Carso Triestino","comune":"DuinoAurisina","quota ingresso [m s.l.m]":109,"quota stazione UCC [m s.l.m]":45.0,"distanza da ingresso":230.0,"distanza da superficie":65.0,"sensori T aria":2,"sensori T roccia":1.0,"sensori T acqua":1.0,"altri parametri misurati":"humidity","anno inizio monitoraggio":2025,"collaborazioni":"Grotta Torri di Slivia srl, Società Adriatica di Speleologia"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[12.5169,42.2746]},"properties":{"stazione UCC":"LAZ-01","nome grotta":"Bunker Soratte","num. Catasto":"NC","area geografica":"Monte Soratte","comune":"Sant'Oreste","quota ingresso [m s.l.m]":425,"quota stazione UCC [m s.l.m]":425.0,"distanza da ingresso":220.0,"distanza da superficie":90.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2025,"collaborazioni":"Associazione Bunker Soratte"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[9.19844,45.82606]},"properties":{"stazione UCC":"LOM-01","nome grotta":"Buco del Piombo","num. Catasto":"Lo-2208","area geografica":"Prealpi Comasche","comune":"Erba","quota ingresso [m s.l.m]":775,"quota stazione UCC [m s.l.m]":null,"distanza da ingresso":null,"distanza da superficie":null,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2026,"collaborazioni":"Museo Buco del Piombo"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[7.83985,44.24155]},"properties":{"stazione UCC":"PIE-02","nome grotta":"Grotta di Bossea","num. Catasto":"Pi-0108","area geografica":"Alpi Liguri","comune":"Frabosa Soprana","quota ingresso [m s.l.m]":830,"quota stazione UCC [m s.l.m]":950.0,"distanza da ingresso":700.0,"distanza da superficie":150.0,"sensori T aria":2,"sensori T roccia":2.0,"sensori T acqua":null,"altri parametri misurati":null,"anno inizio monitoraggio":2021,"collaborazioni":"Politecnico Torino, S.O. Bossea CAI"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[7.84858,44.24021]},"properties":{"stazione UCC":"PIE-03","nome grotta":"Grotta di Costacalda","num. Catasto":"Pi-3613","area geografica":"Alpi Liguri","comune":"Roburent","quota ingresso [m s.l.m]":1037,"quota stazione UCC [m s.l.m]":1050.0,"distanza da ingresso":250.0,"distanza da superficie":80.0,"sensori T aria":1,"sensori T roccia":1.0,"sensori T acqua":null,"altri parametri misurati":null,"anno inizio monitoraggio":2021,"collaborazioni":"Politecnico Torino, Speleo Club Tanaro"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[7.90726,44.294]},"properties":{"stazione UCC":"PIE-04","nome grotta":"Grotta delle Turbiglie","num. Catasto":"Pi-0115","area geografica":"Alpi Liguri","comune":"Roburent","quota ingresso [m s.l.m]":983,"quota stazione UCC [m s.l.m]":930.0,"distanza da ingresso":250.0,"distanza da superficie":100.0,"sensori T aria":2,"sensori T roccia":1.0,"sensori T acqua":null,"altri parametri misurati":null,"anno inizio monitoraggio":2021,"collaborazioni":"Politecnico Torino, Speleo Club Tanaro"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[7.78948,44.29346]},"properties":{"stazione UCC":"PIE-05","nome grotta":"Grotta del Caudano","num. Catasto":"Pi-0121","area geografica":"Alpi Liguri","comune":"Frabosa Sottana","quota ingresso [m s.l.m]":750,"quota stazione UCC [m s.l.m]":770.0,"distanza da ingresso":300.0,"distanza da superficie":150.0,"sensori T aria":2,"sensori T roccia":1.0,"sensori T acqua":null,"altri parametri misurati":null,"anno inizio monitoraggio":2024,"collaborazioni":"Politecnico Torino, Speleo Club Tanaro"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[7.7511,44.15145]},"properties":{"stazione UCC":"PIE-06","nome grotta":"Grotta delle Vene","num. Catasto":"Pi-0103","area geografica":"Alpi Liguri","comune":"Ormea","quota ingresso [m s.l.m]":1580,"quota stazione UCC [m s.l.m]":1590.0,"distanza da ingresso":100.0,"distanza da superficie":150.0,"sensori T aria":2,"sensori T roccia":1.0,"sensori T acqua":null,"altri parametri misurati":null,"anno inizio monitoraggio":2024,"collaborazioni":"Politecnico Torino, Speleo Club Tanaro"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[7.14639,44.699]},"properties":{"stazione UCC":"PIE-11","nome grotta":"Grotta di rio Martino","num. Catasto":"Pi-1001","area geografica":"Alpi Cozie","comune":"Saluzzo","quota ingresso [m s.l.m]":1530,"quota stazione UCC [m s.l.m]":1540.0,"distanza da ingresso":400.0,"distanza da superficie":300.0,"sensori T aria":2,"sensori T roccia":null,"sensori T acqua":null,"altri parametri misurati":null,"anno inizio monitoraggio":2025,"collaborazioni":"Team Esplorativo Acqua"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[10.30077,44.02645]},"properties":{"stazione UCC":"TOS-01","nome grotta":"Antro del Corchia","num. Catasto":"T-0796","area geografica":"Alpi Apuane","comune":"Stazzema","quota ingresso [m s.l.m]":943,"quota stazione UCC [m s.l.m]":900.0,"distanza da ingresso":450.0,"distanza da superficie":130.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2024,"collaborazioni":"Dip. Scienze della Terra, Firenze"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[10.28809,44.04136]},"properties":{"stazione UCC":"TOS-02","nome grotta":"Abisso Farolfi","num. Catasto":"T-0754","area geografica":"Alpi Apuane","comune":"Stazzema","quota ingresso [m s.l.m]":1260,"quota stazione UCC [m s.l.m]":1220.0,"distanza da ingresso":350.0,"distanza da superficie":130.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2024,"collaborazioni":"Dip. Scienze della Terra, Firenze"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[10.2346,44.12682]},"properties":{"stazione UCC":"TOS-03","nome grotta":"Buca dell'Aria Ghiaccia","num. Catasto":"T-1027","area geografica":"Alpi Apuane","comune":"Stazzema","quota ingresso [m s.l.m]":1088,"quota stazione UCC [m s.l.m]":1010.0,"distanza da ingresso":160.0,"distanza da superficie":140.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2024,"collaborazioni":"Progetto Eolo"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[10.29609,44.02922]},"properties":{"stazione UCC":"TOS-04","nome grotta":"Antro del Corchia","num. Catasto":"T-0120","area geografica":"Alpi Apuane","comune":"Stazzema","quota ingresso [m s.l.m]":1145,"quota stazione UCC [m s.l.m]":1145.0,"distanza da ingresso":150.0,"distanza da superficie":100.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2025,"collaborazioni":"Dip. Scienze della Terra, Firenze"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[10.51799,43.69932]},"properties":{"stazione UCC":"TOS-05","nome grotta":"Buca dello Strinato","num. Catasto":"T-0067","area geografica":"Monti Pisani","comune":"San Giuliano Terme","quota ingresso [m s.l.m]":60,"quota stazione UCC [m s.l.m]":28.0,"distanza da ingresso":90.0,"distanza da superficie":40.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2025,"collaborazioni":"Federazione Speleologica Toscana"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[10.35755,44.03419]},"properties":{"stazione UCC":"TOS-06","nome grotta":"Buca del Vento","num. Catasto":"T-0019","area geografica":"Alpi Apuane","comune":"Molazzana","quota ingresso [m s.l.m]":50,"quota stazione UCC [m s.l.m]":700.0,"distanza da ingresso":250.0,"distanza da superficie":35.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2025,"collaborazioni":"Com. Scientififco CAI, Grotta del Vento srl"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[12.74836,43.371682]},"properties":{"stazione UCC":"UMB-01","nome grotta":"Grotta di Monte Cucco","num. Catasto":"Um-0017","area geografica":"Monte Cucco","comune":"Costacciaro","quota ingresso [m s.l.m]":1388,"quota stazione UCC [m s.l.m]":1340.0,"distanza da ingresso":600.0,"distanza da superficie":120.0,"sensori T aria":1,"sensori T roccia":2.0,"sensori T acqua":1.0,"altri parametri misurati":null,"anno inizio monitoraggio":2025,"collaborazioni":"Università degli Uomini Originari di Costacciaro"}}]};
+
+        L.geoJSON(stazioni, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 8,
+                    fillColor: "#2c5282",
+                    color: "#fff",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(createPopup(feature.properties), {
+                    maxWidth: 300
+                });
+            }
+        }).addTo(map);
+    </script>
+</body>
+</html>
