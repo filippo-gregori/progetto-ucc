@@ -265,11 +265,10 @@
                         // Crea popup
                         var pdfSection = '';
                         if (p['scheda_pdf']) {
-                            pdfSection = '<tr><td colspan="2" class="section-title">📄 SCHEDA STAZIONE</td></tr>' +
-                                '<tr><td colspan="2" style="text-align:center; padding:8px;">' +
-                                '<a href="' + p['scheda_pdf'] + '" target="_blank" style="color:#0066cc; font-weight:bold; display:block;">' +
-                                formatValue(p['nome grotta']) + ' (' + formatValue(p['stazione UCC']) + ')' +
-                                '</a></td></tr>';
+                            var nomeScheda = p['scheda_pdf'].split('/').pop().replace('.pdf', '').replace('.PDF', '');
+                            pdfSection = '<tr><td>Scheda stazione:</td><td>' +
+                                '<a href="' + p['scheda_pdf'] + '" target="_blank" style="color:#0066cc;">' +
+                                nomeScheda + '</a></td></tr>';
                         }
 
                         var popup = '<div class="ucc-popup">' +
