@@ -72,7 +72,7 @@ var uccData = {
       },
       "properties": {
         "stazione UCC": "FVG-01",
-        "nome grotta": "Grotta delle Torri si Slivia",
+        "nome grotta": "Grotta delle Torri di Slivia",
         "num. Catasto": "FVG-0022",
         "Long. E": "13,65443",
         "Lat. N": "45,76596",
