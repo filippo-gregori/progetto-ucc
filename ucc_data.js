@@ -27,7 +27,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2026",
-        "collaborazioni": "Grotte di Pertosa / Fondazione MiDA"
+        "collaborazioni": "Grotte di Pertosa / Fondazione MiDA",
+        "scheda_pdf": "Schede%20stazioni/CAM-01-CampitelliII/UCC-CAM-01-Campitelli.pdf"
       }
     },
     {
@@ -56,7 +57,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2025",
-        "collaborazioni": "Federazione Speleologica Campana"
+        "collaborazioni": "Federazione Speleologica Campana",
+        "scheda_pdf": "Schede%20stazioni/CAM-02-Pertosa/UCC-CAM-02-Pertosa.pdf"
       }
     },
     {
@@ -85,7 +87,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "umidità",
         "anno inizio monitoraggio": "2025",
-        "collaborazioni": "Grotta Torri di Slivia srl, Società Adriatica di Speleologia"
+        "collaborazioni": "Grotta Torri di Slivia srl, Società Adriatica di Speleologia",
+        "scheda_pdf": "Schede%20stazioni/FVG-01-TorridiSlivia/UCC-FVG-01-TorridiSlivia.pdf"
       }
     },
     {
@@ -114,7 +117,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2025",
-        "collaborazioni": "Associazione Bunker Soratte"
+        "collaborazioni": "Associazione Bunker Soratte",
+        "scheda_pdf": "Schede%20stazioni/LAZ-01-Soratte/UCC-LAZ-01-Soratte.pdf"
       }
     },
     {
@@ -143,7 +147,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2026",
-        "collaborazioni": "Museo Buco del Piombo"
+        "collaborazioni": "Museo Buco del Piombo",
+        "scheda_pdf": "Schede%20stazioni/LOM-01-Piombo/UCC-LOM-01-Piombo.pdf"
       }
     },
     {
@@ -172,7 +177,8 @@ var uccData = {
         "sensori T acqua": "",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2021",
-        "collaborazioni": "Politecnico Torino, S.O. Bossea CAI"
+        "collaborazioni": "Politecnico Torino, S.O. Bossea CAI",
+        "scheda_pdf": "Schede%20stazioni/PIE-02-Bossea/UCC-PIE-02-Bossea.pdf"
       }
     },
     {
@@ -201,7 +207,8 @@ var uccData = {
         "sensori T acqua": "",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2021",
-        "collaborazioni": "Politecnico Torino, Speleo Club Tanaro"
+        "collaborazioni": "Politecnico Torino, Speleo Club Tanaro",
+        "scheda_pdf": "Schede%20stazioni/PIE-03-Costacalda/UCC-PIE-03-Costacalda.pdf"
       }
     },
     {
@@ -230,7 +237,8 @@ var uccData = {
         "sensori T acqua": "",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2021",
-        "collaborazioni": "Politecnico Torino, Speleo Club Tanaro"
+        "collaborazioni": "Politecnico Torino, Speleo Club Tanaro",
+        "scheda_pdf": "Schede%20stazioni/PIE-04-Turbiglie/UCC-PIE-04-Turbiglie.pdf"
       }
     },
     {
@@ -259,7 +267,8 @@ var uccData = {
         "sensori T acqua": "",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2024",
-        "collaborazioni": "Politecnico Torino, Speleo Club Tanaro"
+        "collaborazioni": "Politecnico Torino, Speleo Club Tanaro",
+        "scheda_pdf": "Schede%20stazioni/PIE-05-Caudano/UCC-PIE-05-Caudano.pdf"
       }
     },
     {
@@ -346,7 +355,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2024",
-        "collaborazioni": "Dip. Scienze della Terra, Firenze"
+        "collaborazioni": "Dip. Scienze della Terra, Firenze",
+        "scheda_pdf": "Schede%20stazioni/TOS-01-Corchia-GdNeve/UCC-TOS-01-Corchia-GdNeve2.pdf"
       }
     },
     {
@@ -375,7 +385,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2024",
-        "collaborazioni": "Dip. Scienze della Terra, Firenze"
+        "collaborazioni": "Dip. Scienze della Terra, Firenze",
+        "scheda_pdf": "Schede%20stazioni/TOS-02-Farolfi/UCC-TOS-02_Farolfi.pdf"
       }
     },
     {
@@ -404,7 +415,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2024",
-        "collaborazioni": "Progetto Eolo"
+        "collaborazioni": "Progetto Eolo",
+        "scheda_pdf": "Schede%20stazioni/TOS-03-AriaGhiaccia/UCC-TOS-03_AriaGhiaccia.pdf"
       }
     },
     {
@@ -433,7 +445,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2025",
-        "collaborazioni": "Dip. Scienze della Terra, Firenze"
+        "collaborazioni": "Dip. Scienze della Terra, Firenze",
+        "scheda_pdf": "Schede%20stazioni/TOS-04-Corchia-Canyon/UCC-TOS-04_Corchia-Canyon.pdf"
       }
     },
     {
@@ -462,7 +475,8 @@ var uccData = {
         "sensori T acqua": "1",
         "altri parametri misurati": "",
         "anno inizio monitoraggio": "2025",
-        "collaborazioni": "Federazione Speleologica Toscana"
+        "collaborazioni": "Federazione Speleologica Toscana",
+        "scheda_pdf": "Schede%20stazioni/TOS-05-Strinato/UCC-TOS-05_Strinato.pdf"
       }
     },
     {
