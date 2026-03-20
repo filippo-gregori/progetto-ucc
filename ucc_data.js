@@ -96,6 +96,65 @@ var uccData = {
       "geometry": {
         "type": "Point",
         "coordinates": [
+          13.814509,
+          45.659647
+        ]
+      },
+      "properties": {
+        "stazione UCC": "FVG-02",
+        "nome grotta": "Acquedotto Teresiano",
+        "num. Catasto": "FVG-TS-CA-14",
+        "Long. E": "13,814509",
+        "Lat. N": "45,659647",
+        "area geografica": "Trieste",
+        "comune": "Trieste",
+        "quota ingresso [m s.l.m]": "72",
+        "quota stazione UCC [m s.l.m]": "52",
+        "distanza da ingresso": "600",
+        "distanza da superficie": "80",
+        "sensori T aria": "1",
+        "sensori T roccia": "2",
+        "sensori T acqua": "1",
+        "altri parametri misurati": "",
+        "anno inizio monitoraggio": "2026",
+        "collaborazioni": "Società Adriatica di Speleologia, Comune di Trieste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.81328817,
+          45.68314746
+        ]
+      },
+      "properties": {
+        "stazione UCC": "FVG-03",
+        "nome grotta": "Grotta Arnaldo Germoni",
+        "num. Catasto": "FVG-4429",
+        "Long. E": "13,81328817",
+        "Lat. N": "45,68314746",
+        "area geografica": "Carso Triestino",
+        "comune": "Trieste",
+        "quota ingresso [m s.l.m]": "326",
+        "quota stazione UCC [m s.l.m]": "252",
+        "distanza da ingresso": "120",
+        "distanza da superficie": "73",
+        "sensori T aria": "1",
+        "sensori T roccia": "2",
+        "sensori T acqua": "1",
+        "altri parametri misurati": "",
+        "anno inizio monitoraggio": "2026",
+        "collaborazioni": "Società Adriatica di Speleologia, Ass. XXX Ottobre",
+        "scheda_pdf": "Schede%20stazioni/FVG-03-Germoni/UCC-FVG-03-Germoni.pdf"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
           12.50824,
           42.23651
         ]
