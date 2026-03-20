@@ -275,7 +275,6 @@
                         var popup = '<div class="ucc-popup">' +
                             '<h4>' + formatValue(p['nome grotta']) + '</h4>' +
                             '<table>' +
-                            pdfSection +
                             '<tr><td colspan="2" class="section-title">🏔️ IDENTIFICAZIONE</td></tr>' +
                             '<tr><td>Stazione UCC:</td><td><strong>' + formatValue(p['stazione UCC']) + '</strong></td></tr>' +
                             '<tr><td>Numero Catasto:</td><td>' + formatValue(p['num. Catasto']) + '</td></tr>' +
@@ -296,6 +295,7 @@
                             '<tr><td colspan="2" class="section-title">👥 MONITORAGGIO</td></tr>' +
                             '<tr><td>Inizio monitoraggio:</td><td><strong>' + formatValue(p['anno inizio monitoraggio']) + '</strong></td></tr>' +
                             '<tr><td>Collaborazioni:</td><td>' + formatValue(p['collaborazioni']) + '</td></tr>' +
+                            pdfSection +
                             '</table>' +
                             '</div>';
 
