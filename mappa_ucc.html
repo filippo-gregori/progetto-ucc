@@ -22,64 +22,128 @@
             width: 100%;
         }
 
-        /* Info panel */
+        /* ── Drawer laterale ── */
+        #drawer {
+            position: fixed;
+            top: 0; right: 0; bottom: 0;
+            width: 300px;
+            background: white;
+            box-shadow: -3px 0 20px rgba(0,0,0,0.25);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+        }
+        #drawer.open {
+            transform: translateX(0);
+        }
+        #drawer-header {
+            background: #0066cc;
+            color: white;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        #drawer-title {
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        #drawer-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 0 0 12px;
+            opacity: 0.8;
+            flex-shrink: 0;
+        }
+        #drawer-close:hover { opacity: 1; }
+
+        #drawer-content {
+            overflow-y: auto;
+            flex: 1;
+            padding: 12px 14px;
+            font-size: 12px;
+        }
+
+        #drawer-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #drawer-content td {
+            padding: 5px 6px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        #drawer-content td:first-child {
+            font-weight: bold;
+            width: 45%;
+            color: #555;
+        }
+        .section-title {
+            background: #e6f2ff;
+            font-weight: bold;
+            padding: 6px;
+            color: #0066cc;
+        }
+        .dati-btn {
+            display: block;
+            margin: 4px 0 14px 0;
+            padding: 8px 14px;
+            background: #0066cc;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .dati-btn:hover { background: #0055aa; }
+
+        /* mobile: drawer pieno schermo */
+        @media (max-width: 600px) {
+            #drawer { width: 100%; }
+        }
+
+        /* ── Info panel (in basso a sinistra) ── */
         .info-panel {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            bottom: 30px;
+            left: 10px;
             background: white;
-            padding: 15px;
+            padding: 12px 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             z-index: 1000;
-            max-width: 350px;
-            transition: all 0.3s ease;
+            max-width: 260px;
         }
-
         .info-panel h2 {
-            margin: 0 0 5px 0;
+            margin: 0 0 4px 0;
             color: #0066cc;
-            font-size: 18px;
+            font-size: 15px;
         }
-
         .info-panel h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
             color: #666;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: normal;
         }
-
         .info-panel p {
-            margin: 8px 0;
-            font-size: 13px;
+            margin: 6px 0;
+            font-size: 12px;
             color: #333;
         }
 
-        /* Toggle button */
-        .toggle-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            z-index: 1001;
-            display: none;
-        }
-
-        .toggle-btn:hover {
-            background: #f0f0f0;
-        }
-
-        /* Logo */
+        /* ── Logo ── */
         .logo {
             position: absolute;
-            bottom: 10px;
+            bottom: 30px;
             right: 10px;
             z-index: 1000;
             background: white;
@@ -87,104 +151,25 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-
-        .logo img {
-            height: 60px;
-            display: block;
-        }
-
-        /* Popup styling */
-        .ucc-popup {
-            font-size: 12px;
-        }
-
-        .ucc-popup h4 {
-            margin: 0 0 10px 0;
-            color: #0066cc;
-            font-size: 16px;
-            border-bottom: 2px solid #0066cc;
-            padding-bottom: 5px;
-        }
-
-        .ucc-popup table {
-            width: 100%;
-            font-size: 12px;
-        }
-
-        .ucc-popup td {
-            padding: 4px 6px;
-            border-bottom: 1px solid #eee;
-            vertical-align: top;
-        }
-
-        .ucc-popup td:first-child {
-            font-weight: bold;
-            width: 45%;
-            color: #555;
-        }
-
-        .ucc-popup .section-title {
-            background-color: #e6f2ff;
-            font-weight: bold;
-            padding: 6px;
-            margin-top: 8px;
-            color: #0066cc;
-        }
-
+        .logo img { height: 60px; display: block; }
 
         #loading {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             background: white;
             padding: 20px 40px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 2000;
+            z-index: 3000;
             font-size: 16px;
             display: none;
         }
+        #loading.show { display: block; }
 
-        #loading.show {
-            display: block;
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .info-panel {
-                max-width: calc(100vw - 70px);
-                font-size: 12px;
-                padding: 10px;
-            }
-
-            .info-panel.collapsed {
-                transform: translateX(calc(100% + 20px));
-            }
-
-            .info-panel.expanded {
-                transform: translateX(0);
-            }
-
-            .toggle-btn {
-                display: block;
-            }
-
-            .info-panel h2 {
-                font-size: 16px;
-            }
-
-            .info-panel h3 {
-                font-size: 12px;
-            }
-
-            .info-panel p {
-                font-size: 11px;
-            }
-
-            .logo img {
-                height: 45px;
-            }
+        @media (max-width: 600px) {
+            .logo { display: none; }
+            .info-panel { max-width: calc(100vw - 20px); }
         }
     </style>
 </head>
@@ -192,16 +177,21 @@
     <div id="map"></div>
     <div id="loading">Caricamento stazioni in corso...</div>
 
-    <button class="toggle-btn" id="toggle-info">ℹ️</button>
+    <!-- Drawer laterale -->
+    <div id="drawer">
+        <div id="drawer-header">
+            <span id="drawer-title"></span>
+            <button id="drawer-close" title="Chiudi">✕</button>
+        </div>
+        <div id="drawer-content"></div>
+    </div>
 
     <div class="info-panel" id="info-panel">
         <h2>Underground Climate Change</h2>
         <h3>Rete nazionale di monitoraggio microclimatico in grotta</h3>
-        <hr style="margin: 10px 0; border: none; border-top: 1px solid #ddd;">
+        <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
         <p id="station-count" style="font-weight: bold; color: #0066cc;">Totale stazioni: 18</p>
-        <p style="font-size: 11px; color: #666;">
-            Clicca sui marker per visualizzare i dettagli delle stazioni
-        </p>
+        <p style="font-size: 11px; color: #666;">Clicca sui marker per i dettagli</p>
     </div>
 
     <div class="logo">
@@ -210,23 +200,18 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Dati stazioni inclusi -->
     <script src="ucc_data.js?v=2"></script>
 
     <script>
-        // Aspetta che le librerie siano caricate
         window.addEventListener('load', function() {
             setTimeout(initMap, 300);
         });
 
         function initMap() {
             try {
-                // Inizializza mappa centrata sull'Italia
                 var map = L.map('map').setView([43.5, 11.5], 6);
 
-                // Base layers
-                var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(map);
 
@@ -235,79 +220,78 @@
                     maxZoom: 20
                 });
 
-                // Layer control (in alto a sinistra per non sovrapporsi all'info panel)
                 L.control.layers({
-                    "Mappa stradale": osmLayer,
+                    "Mappa stradale": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map),
                     "Satellite": satelliteLayer
-                }, null, {position: 'topleft'}).addTo(map);
+                }, null, { position: 'topleft' }).addTo(map);
 
-                // Funzioni helper
                 function formatValue(val) {
                     return (val !== null && val !== undefined && val !== '') ? val : '—';
                 }
 
-                // Carica dati stazioni
+                // ── Drawer ──
+                var drawer = document.getElementById('drawer');
+                var drawerTitle = document.getElementById('drawer-title');
+                var drawerContent = document.getElementById('drawer-content');
+
+                document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+                map.on('click', closeDrawer);
+
+                function closeDrawer() {
+                    drawer.classList.remove('open');
+                }
+
+                function openDrawer(p, coords) {
+                    drawerTitle.textContent = formatValue(p['nome grotta']);
+
+                    var datiBtn = p['dati_url']
+                        ? '<a class="dati-btn" href="' + p['dati_url'] + '" target="_blank">📊 Visualizza dati</a>'
+                        : '';
+
+                    var pdfRow = p['scheda_pdf']
+                        ? '<tr><td>Scheda:</td><td><a href="' + p['scheda_pdf'] + '" target="_blank" style="color:#0066cc;">' +
+                          p['scheda_pdf'].split('/').pop().replace(/\.pdf$/i, '') + '</a></td></tr>'
+                        : '';
+
+                    drawerContent.innerHTML = datiBtn +
+                        '<table>' +
+                        '<tr><td colspan="2" class="section-title">🏔️ IDENTIFICAZIONE</td></tr>' +
+                        '<tr><td>Stazione UCC:</td><td><strong>' + formatValue(p['stazione UCC']) + '</strong></td></tr>' +
+                        '<tr><td>Num. Catasto:</td><td>' + formatValue(p['num. Catasto']) + '</td></tr>' +
+                        '<tr><td colspan="2" class="section-title">📍 LOCALIZZAZIONE</td></tr>' +
+                        '<tr><td>Area:</td><td>' + formatValue(p['area geografica']) + '</td></tr>' +
+                        '<tr><td>Comune:</td><td>' + formatValue(p['comune']) + '</td></tr>' +
+                        '<tr><td>Coordinate:</td><td>' + coords[1].toFixed(5) + '°N<br>' + coords[0].toFixed(5) + '°E</td></tr>' +
+                        '<tr><td>Quota ingresso:</td><td>' + formatValue(p['quota ingresso [m s.l.m]']) + ' m s.l.m.</td></tr>' +
+                        '<tr><td>Quota stazione:</td><td>' + formatValue(p['quota stazione UCC [m s.l.m]']) + ' m s.l.m.</td></tr>' +
+                        '<tr><td colspan="2" class="section-title">📏 CARATTERISTICHE</td></tr>' +
+                        '<tr><td>Dist. ingresso:</td><td>' + formatValue(p['distanza da ingresso']) + '</td></tr>' +
+                        '<tr><td>Dist. superficie:</td><td>' + formatValue(p['distanza da superficie']) + '</td></tr>' +
+                        '<tr><td colspan="2" class="section-title">🌡️ SENSORI</td></tr>' +
+                        '<tr><td>T aria:</td><td>' + formatValue(p['sensori T aria']) + '</td></tr>' +
+                        '<tr><td>T roccia:</td><td>' + formatValue(p['sensori T roccia']) + '</td></tr>' +
+                        '<tr><td>T acqua:</td><td>' + formatValue(p['sensori T acqua']) + '</td></tr>' +
+                        '<tr><td>Altri:</td><td>' + formatValue(p['altri parametri misurati']) + '</td></tr>' +
+                        '<tr><td colspan="2" class="section-title">👥 MONITORAGGIO</td></tr>' +
+                        '<tr><td>Inizio:</td><td><strong>' + formatValue(p['anno inizio monitoraggio']) + '</strong></td></tr>' +
+                        '<tr><td>Collaborazioni:</td><td>' + formatValue(p['collaborazioni']) + '</td></tr>' +
+                        pdfRow +
+                        '</table>';
+
+                    drawer.classList.add('open');
+                }
+
+                // ── Marker ──
                 var data = uccData;
-                var stationCount = data.features.length;
+                document.getElementById('station-count').textContent = 'Totale stazioni: ' + data.features.length;
 
-                document.getElementById('station-count').textContent =
-                    'Totale stazioni: ' + stationCount;
-
-                // Aggiungi marker per ogni stazione
                 data.features.forEach(function(f) {
                     var p = f.properties;
                     var coords = f.geometry.coordinates;
-
                     try {
-                        var latLng = [coords[1], coords[0]]; // GeoJSON è [lon, lat], Leaflet è [lat, lon]
-
-                        // Crea popup
-                        var pdfSection = '';
-                        if (p['scheda_pdf']) {
-                            var nomeScheda = p['scheda_pdf'].split('/').pop().replace('.pdf', '').replace('.PDF', '');
-                            pdfSection = '<tr><td>Scheda stazione:</td><td>' +
-                                '<a href="' + p['scheda_pdf'] + '" target="_blank" style="color:#0066cc;">' +
-                                nomeScheda + '</a></td></tr>';
-                        }
-
-                        var datiButton = '';
-                        if (p['dati_url']) {
-                            datiButton = '<a href="' + p['dati_url'] + '" target="_blank" style="' +
-                                'display:inline-block;margin:6px 0 10px 0;padding:5px 12px;' +
-                                'background:#0066cc;color:white;border-radius:4px;text-decoration:none;font-size:12px;font-weight:bold;">' +
-                                '📊 Visualizza dati</a>';
-                        }
-
-                        var popup = '<div class="ucc-popup">' +
-                            '<h4>' + formatValue(p['nome grotta']) + '</h4>' +
-                            datiButton +
-                            '<table>' +
-                            '<tr><td colspan="2" class="section-title">🏔️ IDENTIFICAZIONE</td></tr>' +
-                            '<tr><td>Stazione UCC:</td><td><strong>' + formatValue(p['stazione UCC']) + '</strong></td></tr>' +
-                            '<tr><td>Numero Catasto:</td><td>' + formatValue(p['num. Catasto']) + '</td></tr>' +
-                            '<tr><td colspan="2" class="section-title">📍 LOCALIZZAZIONE</td></tr>' +
-                            '<tr><td>Area Geografica:</td><td>' + formatValue(p['area geografica']) + '</td></tr>' +
-                            '<tr><td>Comune:</td><td>' + formatValue(p['comune']) + '</td></tr>' +
-                            '<tr><td>Coordinate:</td><td>' + coords[1].toFixed(5) + '°N, ' + coords[0].toFixed(5) + '°E</td></tr>' +
-                            '<tr><td>Quota Ingresso:</td><td>' + formatValue(p['quota ingresso [m s.l.m]']) + ' m s.l.m.</td></tr>' +
-                            '<tr><td>Quota Stazione:</td><td>' + formatValue(p['quota stazione UCC [m s.l.m]']) + ' m s.l.m.</td></tr>' +
-                            '<tr><td colspan="2" class="section-title">📏 CARATTERISTICHE</td></tr>' +
-                            '<tr><td>Distanza da ingresso:</td><td>' + formatValue(p['distanza da ingresso']) + '</td></tr>' +
-                            '<tr><td>Distanza da superficie:</td><td>' + formatValue(p['distanza da superficie']) + '</td></tr>' +
-                            '<tr><td colspan="2" class="section-title">🌡️ SENSORI</td></tr>' +
-                            '<tr><td>T aria:</td><td>' + formatValue(p['sensori T aria']) + '</td></tr>' +
-                            '<tr><td>T roccia:</td><td>' + formatValue(p['sensori T roccia']) + '</td></tr>' +
-                            '<tr><td>T acqua:</td><td>' + formatValue(p['sensori T acqua']) + '</td></tr>' +
-                            '<tr><td>Altri parametri:</td><td>' + formatValue(p['altri parametri misurati']) + '</td></tr>' +
-                            '<tr><td colspan="2" class="section-title">👥 MONITORAGGIO</td></tr>' +
-                            '<tr><td>Inizio monitoraggio:</td><td><strong>' + formatValue(p['anno inizio monitoraggio']) + '</strong></td></tr>' +
-                            '<tr><td>Collaborazioni:</td><td>' + formatValue(p['collaborazioni']) + '</td></tr>' +
-                            pdfSection +
-                            '</table>' +
-                            '</div>';
-
-                        // Crea marker circolare semplice
-                        var marker = L.circleMarker(latLng, {
+                        var marker = L.circleMarker([coords[1], coords[0]], {
                             radius: 8,
                             fillColor: '#0066cc',
                             color: '#ffffff',
@@ -315,40 +299,20 @@
                             opacity: 1,
                             fillOpacity: 0.8
                         });
-                        marker.bindPopup(popup, { maxWidth: 420 });
+                        marker.on('click', function(e) {
+                            L.DomEvent.stopPropagation(e);
+                            openDrawer(p, coords);
+                        });
                         marker.addTo(map);
-
                     } catch (e) {
-                        console.error('Errore processamento stazione:', e);
+                        console.error('Errore stazione:', e);
                     }
                 });
 
-                // Toggle panel per mobile
-                var isMobile = window.innerWidth <= 768;
-                var infoPanel = document.getElementById('info-panel');
-                var toggleInfo = document.getElementById('toggle-info');
-
-                if (isMobile) {
-                    infoPanel.classList.add('collapsed');
-                }
-
-                toggleInfo.addEventListener('click', function() {
-                    if (infoPanel.classList.contains('expanded') || (!isMobile && !infoPanel.classList.contains('collapsed'))) {
-                        infoPanel.classList.remove('expanded');
-                        infoPanel.classList.add('collapsed');
-                        toggleInfo.innerHTML = 'ℹ️';
-                    } else {
-                        infoPanel.classList.remove('collapsed');
-                        infoPanel.classList.add('expanded');
-                        toggleInfo.innerHTML = '✖️';
-                    }
-                });
-
-                console.log('Caricate ' + stationCount + ' stazioni UCC');
+                console.log('Caricate ' + data.features.length + ' stazioni UCC');
 
             } catch (e) {
                 document.getElementById('station-count').textContent = 'Errore: ' + e.message;
-                document.getElementById('loading').textContent = 'Errore: ' + e.message;
                 console.error(e);
             }
         }
