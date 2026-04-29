@@ -88,7 +88,8 @@ var uccData = {
         "altri parametri misurati": "umidità",
         "anno inizio monitoraggio": "2025",
         "collaborazioni": "Grotta Torri di Slivia srl, Società Adriatica di Speleologia",
-        "scheda_pdf": "Schede%20stazioni/FVG-01-TorridiSlivia/UCC-FVG-01-TorridiSlivia.pdf"
+        "scheda_pdf": "Schede%20stazioni/FVG-01-TorridiSlivia/UCC-FVG-01-TorridiSlivia.pdf",
+        "dati_url": "dati.html?station=fvg03"
       }
     },
     {

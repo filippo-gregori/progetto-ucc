@@ -95,7 +95,7 @@
 
         /* Popup styling */
         .ucc-popup {
-            max-width: 400px;
+            min-width: 340px;
             font-size: 12px;
         }
 
@@ -213,7 +213,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Dati stazioni inclusi -->
-    <script src="ucc_data.js"></script>
+    <script src="ucc_data.js?v=2"></script>
 
     <script>
         // Aspetta che le librerie siano caricate
@@ -271,8 +271,17 @@
                                 nomeScheda + '</a></td></tr>';
                         }
 
+                        var datiButton = '';
+                        if (p['dati_url']) {
+                            datiButton = '<a href="' + p['dati_url'] + '" target="_blank" style="' +
+                                'display:inline-block;margin:6px 0 10px 0;padding:5px 12px;' +
+                                'background:#0066cc;color:white;border-radius:4px;text-decoration:none;font-size:12px;font-weight:bold;">' +
+                                '📊 Visualizza dati</a>';
+                        }
+
                         var popup = '<div class="ucc-popup">' +
                             '<h4>' + formatValue(p['nome grotta']) + '</h4>' +
+                            datiButton +
                             '<table>' +
                             '<tr><td colspan="2" class="section-title">🏔️ IDENTIFICAZIONE</td></tr>' +
                             '<tr><td>Stazione UCC:</td><td><strong>' + formatValue(p['stazione UCC']) + '</strong></td></tr>' +
@@ -307,7 +316,7 @@
                             opacity: 1,
                             fillOpacity: 0.8
                         });
-                        marker.bindPopup(popup);
+                        marker.bindPopup(popup, { maxWidth: 420 });
                         marker.addTo(map);
 
                     } catch (e) {

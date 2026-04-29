@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dati UCC</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        header {
+            background: #0066cc;
+            color: white;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        header h1 { font-size: 1.1rem; font-weight: bold; }
+        header p  { font-size: 0.85rem; opacity: 0.85; }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .back-link:hover { opacity: 1; }
+
+        main {
+            max-width: 960px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .control-group label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .control-group select,
+        .control-group input[type="date"] {
+            padding: 7px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .btn:hover { background: #0055aa; }
+
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .stat-box {
+            flex: 1;
+            min-width: 120px;
+            background: #f0f6ff;
+            border: 1px solid #c8ddf5;
+            border-radius: 6px;
+            padding: 10px 14px;
+            text-align: center;
+        }
+        .stat-box .val {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        .stat-box .lbl {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 340px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 12px;
+        }
+
+        .toggle-table {
+            font-size: 0.85rem;
+            color: #0066cc;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        th {
+            background: #0066cc;
+            color: white;
+            padding: 7px 10px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:nth-child(even) td { background: #f7faff; }
+
+        #msg {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .chart-container { height: 260px; }
+            header { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1 id="header-title">Dati stazione UCC</h1>
+        <p id="header-sub">Underground Climate Change</p>
+    </div>
+    <a class="back-link" href="mappa_ucc.html">← Mappa stazioni</a>
+</header>
+
+<main>
+    <div id="msg">Caricamento dati...</div>
+
+    <div id="content" style="display:none">
+
+        <!-- Controlli -->
+        <div class="card">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Sensore</label>
+                    <select id="sensor-select"></select>
+                </div>
+                <div class="control-group">
+                    <label>Dal</label>
+                    <input type="date" id="date-from">
+                </div>
+                <div class="control-group">
+                    <label>Al</label>
+                    <input type="date" id="date-to">
+                </div>
+                <button class="btn" onclick="updateChart()">Aggiorna</button>
+            </div>
+        </div>
+
+        <!-- Statistiche -->
+        <div class="card">
+            <div class="section-title">Statistiche periodo selezionato</div>
+            <div class="stats-row">
+                <div class="stat-box"><div class="val" id="stat-mean">—</div><div class="lbl">Media (°C)</div></div>
+                <div class="stat-box"><div class="val" id="stat-max">—</div><div class="lbl">Massima (°C)</div></div>
+                <div class="stat-box"><div class="val" id="stat-min">—</div><div class="lbl">Minima (°C)</div></div>
+                <div class="stat-box"><div class="val" id="stat-n">—</div><div class="lbl">Giorni</div></div>
+            </div>
+        </div>
+
+        <!-- Grafico -->
+        <div class="card">
+            <div class="section-title">Andamento temperatura giornaliera</div>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabella -->
+        <div class="card">
+            <button class="toggle-table" onclick="toggleTable()">▶ Mostra dati tabellari</button>
+            <div id="table-wrap" class="table-wrap" style="display:none">
+                <table>
+                    <thead id="table-head"></thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script>
+let allData = [];
+let meta = {};
+let chart = null;
+
+// Legge ?station=fvg03 dall'URL
+const stationKey = new URLSearchParams(window.location.search).get('station') || 'fvg03';
+
+async function loadData() {
+    try {
+        // Carica meta
+        const metaResp = await fetch(`data/${stationKey}_meta.json`);
+        if (!metaResp.ok) throw new Error(`Meta non trovato: data/${stationKey}_meta.json`);
+        meta = await metaResp.json();
+
+        document.getElementById('header-title').textContent = meta.name;
+        document.getElementById('header-sub').textContent = `Stazione UCC ${meta.station_id} — Underground Climate Change`;
+        document.title = `Dati ${meta.station_id} — UCC`;
+
+        // Popola dropdown sensori
+        const sel = document.getElementById('sensor-select');
+        for (const [key, label] of Object.entries(meta.sensors)) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = label;
+            sel.appendChild(opt);
+        }
+
+        // Date range default = tutto il periodo
+        document.getElementById('date-from').value = meta.date_min;
+        document.getElementById('date-to').value   = meta.date_max;
+
+        // Carica CSV
+        const csvResp = await fetch(`data/${stationKey}.csv`);
+        if (!csvResp.ok) throw new Error(`CSV non trovato: data/${stationKey}.csv`);
+        const csvText = await csvResp.text();
+
+        const parsed = Papa.parse(csvText, { header: true, dynamicTyping: true, skipEmptyLines: true });
+        allData = parsed.data;
+
+        document.getElementById('msg').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+        updateChart();
+
+    } catch (e) {
+        document.getElementById('msg').textContent = 'Errore: ' + e.message;
+    }
+}
+
+function filterData() {
+    const from = document.getElementById('date-from').value;
+    const to   = document.getElementById('date-to').value;
+    return allData.filter(r => r.date >= from && r.date <= to);
+}
+
+function updateChart() {
+    const sensor = document.getElementById('sensor-select').value;
+    const rows = filterData();
+
+    const labels   = rows.map(r => r.date);
+    const meanVals = rows.map(r => r[`${sensor}_mean`]);
+    const maxVals  = rows.map(r => r[`${sensor}_max`]);
+    const minVals  = rows.map(r => r[`${sensor}_min`]);
+
+    // Stats
+    const validMean = meanVals.filter(v => v != null);
+    const validMax  = maxVals.filter(v => v != null);
+    const validMin  = minVals.filter(v => v != null);
+
+    document.getElementById('stat-mean').textContent = validMean.length
+        ? (validMean.reduce((a,b)=>a+b,0) / validMean.length).toFixed(2) : '—';
+    document.getElementById('stat-max').textContent  = validMax.length  ? Math.max(...validMax).toFixed(2)  : '—';
+    document.getElementById('stat-min').textContent  = validMin.length  ? Math.min(...validMin).toFixed(2)  : '—';
+    document.getElementById('stat-n').textContent    = rows.length;
+
+    const color = '0,102,204';
+
+    const datasets = [
+        {
+            label: 'Max',
+            data: maxVals,
+            borderColor: `rgba(${color},0.25)`,
+            borderWidth: 1,
+            borderDash: [4, 3],
+            pointRadius: 0,
+            fill: 1,
+            backgroundColor: `rgba(${color},0.10)`,
+            order: 3,
+        },
+        {
+            label: 'Min',
+            data: minVals,
+            borderColor: `rgba(${color},0.25)`,
+            borderWidth: 1,
+            borderDash: [4, 3],
+            pointRadius: 0,
+            fill: false,
+            order: 3,
+        },
+        {
+            label: 'Media',
+            data: meanVals,
+            borderColor: `rgba(${color},1)`,
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: false,
+            order: 1,
+            tension: 0.3,
+        },
+    ];
+
+    if (chart) {
+        chart.data.labels = labels;
+        chart.data.datasets = datasets;
+        chart.update();
+    } else {
+        chart = new Chart(document.getElementById('chart'), {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: {
+                            filter: item => item.text === 'Media',
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: ctx => ctx[0].label,
+                            label: ctx => {
+                                const names = { Max: 'Max', Min: 'Min', Media: 'Media' };
+                                return `${names[ctx.dataset.label]}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(2) + ' °C' : '—'}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 12,
+                            font: { size: 11 },
+                        },
+                        grid: { color: '#eee' },
+                    },
+                    y: {
+                        title: { display: true, text: 'Temperatura (°C)', font: { size: 11 } },
+                        grid: { color: '#eee' },
+                        ticks: { font: { size: 11 } },
+                    }
+                }
+            }
+        });
+    }
+
+    // Aggiorna tabella se visibile
+    if (document.getElementById('table-wrap').style.display !== 'none') {
+        renderTable(rows, sensor);
+    }
+}
+
+function renderTable(rows, sensor) {
+    const thead = document.getElementById('table-head');
+    const tbody = document.getElementById('table-body');
+    thead.innerHTML = `<tr>
+        <th>Data</th>
+        <th>Media (°C)</th>
+        <th>Max (°C)</th>
+        <th>Min (°C)</th>
+    </tr>`;
+    tbody.innerHTML = rows.map(r => `<tr>
+        <td>${r.date}</td>
+        <td>${r[`${sensor}_mean`] ?? '—'}</td>
+        <td>${r[`${sensor}_max`]  ?? '—'}</td>
+        <td>${r[`${sensor}_min`]  ?? '—'}</td>
+    </tr>`).join('');
+}
+
+function toggleTable() {
+    const wrap = document.getElementById('table-wrap');
+    const btn  = document.querySelector('.toggle-table');
+    const visible = wrap.style.display !== 'none';
+    wrap.style.display = visible ? 'none' : 'block';
+    btn.textContent = (visible ? '▶' : '▼') + ' ' + (visible ? 'Mostra' : 'Nascondi') + ' dati tabellari';
+    if (!visible) {
+        renderTable(filterData(), document.getElementById('sensor-select').value);
+    }
+}
+
+loadData();
+</script>
+</body>
+</html>

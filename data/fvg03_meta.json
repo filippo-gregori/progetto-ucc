@@ -1,0 +1,13 @@
+{
+  "station_id": "FVG-03",
+  "name": "Grotta Arnaldo Germoni",
+  "sensors": {
+    "ext": "T esterna (Prepotto)",
+    "air1": "T aria interna 1",
+    "air2": "T aria interna 2",
+    "water": "T acqua",
+    "rock": "T roccia 40cm"
+  },
+  "date_min": "2025-03-30",
+  "date_max": "2026-03-01"
+}
