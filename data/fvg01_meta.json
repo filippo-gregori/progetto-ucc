@@ -1,0 +1,9 @@
+{
+  "station_id": "FVG-01",
+  "name": "Grotta delle Torri di Slivia",
+  "sensors": {
+    "air1": "T aria UCC"
+  },
+  "date_min": "2025-03-30",
+  "date_max": "2026-03-01"
+}

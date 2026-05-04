@@ -88,6 +88,8 @@
             font-weight: bold;
         }
         .btn:hover { background: #0055aa; }
+        .btn-secondary { background: #5a8a5a; }
+        .btn-secondary:hover { background: #477047; }
 
         .stats-row {
             display: flex;
@@ -208,6 +210,7 @@
                     <input type="date" id="date-to">
                 </div>
                 <button class="btn" onclick="updateChart()">Aggiorna</button>
+                <button class="btn btn-secondary" onclick="downloadCSV()">⬇ Scarica CSV</button>
             </div>
         </div>
 
@@ -434,6 +437,35 @@ function toggleTable() {
     if (!visible) {
         renderTable(filterData(), document.getElementById('sensor-select').value);
     }
+}
+
+function downloadCSV() {
+    const sensor = document.getElementById('sensor-select').value;
+    const sensorLabel = document.getElementById('sensor-select').options[document.getElementById('sensor-select').selectedIndex].text;
+    const rows = filterData();
+    const from = document.getElementById('date-from').value;
+    const to   = document.getElementById('date-to').value;
+
+    const lines = [
+        `# Stazione: ${meta.name} (${meta.station_id})`,
+        `# Sensore: ${sensorLabel}`,
+        `# Periodo: ${from} / ${to}`,
+        'Data,Media (°C),Max (°C),Min (°C)',
+        ...rows.map(r => [
+            r.date,
+            r[`${sensor}_mean`] ?? '',
+            r[`${sensor}_max`]  ?? '',
+            r[`${sensor}_min`]  ?? ''
+        ].join(','))
+    ];
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `UCC_${meta.station_id}_${sensor}_${from}_${to}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 loadData();

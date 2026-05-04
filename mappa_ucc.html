@@ -255,7 +255,7 @@
                           p['scheda_pdf'].split('/').pop().replace(/\.pdf$/i, '') + '</a></td></tr>'
                         : '';
 
-                    drawerContent.innerHTML = datiBtn +
+                    drawerContent.innerHTML =
                         '<table>' +
                         '<tr><td colspan="2" class="section-title">🏔️ IDENTIFICAZIONE</td></tr>' +
                         '<tr><td>Stazione UCC:</td><td><strong>' + formatValue(p['stazione UCC']) + '</strong></td></tr>' +
@@ -278,7 +278,8 @@
                         '<tr><td>Inizio:</td><td><strong>' + formatValue(p['anno inizio monitoraggio']) + '</strong></td></tr>' +
                         '<tr><td>Collaborazioni:</td><td>' + formatValue(p['collaborazioni']) + '</td></tr>' +
                         pdfRow +
-                        '</table>';
+                        '</table>' +
+                        datiBtn;
 
                     drawer.classList.add('open');
                 }

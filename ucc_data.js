@@ -89,7 +89,7 @@ var uccData = {
         "anno inizio monitoraggio": "2025",
         "collaborazioni": "Grotta Torri di Slivia srl, Società Adriatica di Speleologia",
         "scheda_pdf": "Schede%20stazioni/FVG-01-TorridiSlivia/UCC-FVG-01-TorridiSlivia.pdf",
-        "dati_url": "dati.html?station=fvg03"
+        "dati_url": "dati.html?station=fvg01"
       }
     },
     {
