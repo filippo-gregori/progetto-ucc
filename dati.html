@@ -68,13 +68,29 @@
             text-transform: uppercase;
             letter-spacing: 0.03em;
         }
-        .control-group select,
         .control-group input[type="date"] {
             padding: 7px 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 0.9rem;
             background: white;
+        }
+
+        .sensor-toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+        .sensor-btn {
+            padding: 6px 13px;
+            border: 2px solid var(--sc);
+            border-radius: 20px;
+            background: white;
+            color: var(--sc);
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: bold;
+            transition: background 0.15s, color 0.15s;
+        }
+        .sensor-btn.active {
+            background: var(--sc);
+            color: white;
         }
 
         .btn {
@@ -198,8 +214,8 @@
         <div class="card">
             <div class="controls">
                 <div class="control-group">
-                    <label>Sensore</label>
-                    <select id="sensor-select"></select>
+                    <label>Sensori</label>
+                    <div id="sensor-toggles" class="sensor-toggles"></div>
                 </div>
                 <div class="control-group">
                     <label>Dal</label>
@@ -217,12 +233,7 @@
         <!-- Statistiche -->
         <div class="card">
             <div class="section-title">Statistiche periodo selezionato</div>
-            <div class="stats-row">
-                <div class="stat-box"><div class="val" id="stat-mean">—</div><div class="lbl">Media (°C)</div></div>
-                <div class="stat-box"><div class="val" id="stat-max">—</div><div class="lbl">Massima (°C)</div></div>
-                <div class="stat-box"><div class="val" id="stat-min">—</div><div class="lbl">Minima (°C)</div></div>
-                <div class="stat-box"><div class="val" id="stat-n">—</div><div class="lbl">Giorni</div></div>
-            </div>
+            <div id="stats-row" class="stats-row"></div>
         </div>
 
         <!-- Grafico -->
@@ -252,12 +263,26 @@ let allData = [];
 let meta = {};
 let chart = null;
 
-// Legge ?station=fvg03 dall'URL
-const stationKey = new URLSearchParams(window.location.search).get('station') || 'fvg03';
+const SENSOR_COLORS = {
+    air1:  '0,102,204',
+    air2:  '120,0,180',
+    ext:   '200,100,0',
+    rock:  '140,80,30',
+    water: '0,130,130',
+};
+
+const stationKey = new URLSearchParams(window.location.search).get('station') || 'fvg01';
+
+function getActiveSensors() {
+    return [...document.querySelectorAll('.sensor-btn.active')].map(b => b.dataset.sensor);
+}
+
+function colorOf(key) {
+    return SENSOR_COLORS[key] || '100,100,100';
+}
 
 async function loadData() {
     try {
-        // Carica meta
         const metaResp = await fetch(`data/${stationKey}_meta.json`);
         if (!metaResp.ok) throw new Error(`Meta non trovato: data/${stationKey}_meta.json`);
         meta = await metaResp.json();
@@ -266,32 +291,31 @@ async function loadData() {
         document.getElementById('header-sub').textContent = `Stazione UCC ${meta.station_id} — Underground Climate Change`;
         document.title = `Dati ${meta.station_id} — UCC`;
 
-        // Popola dropdown sensori
-        const sel = document.getElementById('sensor-select');
+        const container = document.getElementById('sensor-toggles');
+        let first = true;
         for (const [key, label] of Object.entries(meta.sensors)) {
-            const opt = document.createElement('option');
-            opt.value = key;
-            opt.textContent = label;
-            sel.appendChild(opt);
+            const btn = document.createElement('button');
+            btn.className = 'sensor-btn' + (first ? ' active' : '');
+            btn.dataset.sensor = key;
+            btn.style.setProperty('--sc', `rgb(${colorOf(key)})`);
+            btn.textContent = label;
+            btn.addEventListener('click', () => { btn.classList.toggle('active'); updateChart(); });
+            container.appendChild(btn);
+            first = false;
         }
 
-        // Date range default = tutto il periodo
         document.getElementById('date-from').value = meta.date_min;
         document.getElementById('date-to').value   = meta.date_max;
 
-        // Carica CSV
         const csvResp = await fetch(`data/${stationKey}.csv`);
         if (!csvResp.ok) throw new Error(`CSV non trovato: data/${stationKey}.csv`);
-        const csvText = await csvResp.text();
-
-        const parsed = Papa.parse(csvText, { header: true, dynamicTyping: true, skipEmptyLines: true });
+        const parsed = Papa.parse(await csvResp.text(), { header: true, dynamicTyping: true, skipEmptyLines: true });
         allData = parsed.data;
 
         document.getElementById('msg').style.display = 'none';
         document.getElementById('content').style.display = 'block';
 
         updateChart();
-
     } catch (e) {
         document.getElementById('msg').textContent = 'Errore: ' + e.message;
     }
@@ -304,60 +328,70 @@ function filterData() {
 }
 
 function updateChart() {
-    const sensor = document.getElementById('sensor-select').value;
-    const rows = filterData();
-
-    const labels   = rows.map(r => r.date);
-    const meanVals = rows.map(r => r[`${sensor}_mean`]);
-    const maxVals  = rows.map(r => r[`${sensor}_max`]);
-    const minVals  = rows.map(r => r[`${sensor}_min`]);
+    const active = getActiveSensors();
+    const rows   = filterData();
+    const labels = rows.map(r => r.date);
+    const single = active.length === 1;
 
     // Stats
-    const validMean = meanVals.filter(v => v != null);
-    const validMax  = maxVals.filter(v => v != null);
-    const validMin  = minVals.filter(v => v != null);
+    const statsEl = document.getElementById('stats-row');
+    if (active.length === 0) {
+        statsEl.innerHTML = '<div class="stat-box"><div class="val" style="font-size:1rem">—</div><div class="lbl">Nessun sensore selezionato</div></div>';
+    } else if (single) {
+        const s = active[0];
+        const means = rows.map(r => r[`${s}_mean`]).filter(v => v != null);
+        const maxs  = rows.map(r => r[`${s}_max`]).filter(v => v != null);
+        const mins  = rows.map(r => r[`${s}_min`]).filter(v => v != null);
+        statsEl.innerHTML =
+            `<div class="stat-box"><div class="val">${means.length ? (means.reduce((a,b)=>a+b)/means.length).toFixed(2) : '—'}</div><div class="lbl">Media (°C)</div></div>` +
+            `<div class="stat-box"><div class="val">${maxs.length  ? Math.max(...maxs).toFixed(2)  : '—'}</div><div class="lbl">Massima (°C)</div></div>` +
+            `<div class="stat-box"><div class="val">${mins.length  ? Math.min(...mins).toFixed(2)  : '—'}</div><div class="lbl">Minima (°C)</div></div>` +
+            `<div class="stat-box"><div class="val">${rows.length}</div><div class="lbl">Giorni</div></div>`;
+    } else {
+        let html = `<div class="stat-box"><div class="val">${rows.length}</div><div class="lbl">Giorni</div></div>`;
+        for (const s of active) {
+            const means = rows.map(r => r[`${s}_mean`]).filter(v => v != null);
+            const maxs  = rows.map(r => r[`${s}_max`]).filter(v => v != null);
+            const mins  = rows.map(r => r[`${s}_min`]).filter(v => v != null);
+            html += `<div class="stat-box" style="border-color:rgb(${colorOf(s)});min-width:150px">` +
+                `<div class="lbl" style="color:rgb(${colorOf(s)})">${meta.sensors[s]}</div>` +
+                `<div class="val" style="font-size:1.1rem">${means.length ? (means.reduce((a,b)=>a+b)/means.length).toFixed(2) : '—'} °C</div>` +
+                `<div class="lbl">max ${maxs.length ? Math.max(...maxs).toFixed(2) : '—'} · min ${mins.length ? Math.min(...mins).toFixed(2) : '—'}</div>` +
+                `</div>`;
+        }
+        statsEl.innerHTML = html;
+    }
 
-    document.getElementById('stat-mean').textContent = validMean.length
-        ? (validMean.reduce((a,b)=>a+b,0) / validMean.length).toFixed(2) : '—';
-    document.getElementById('stat-max').textContent  = validMax.length  ? Math.max(...validMax).toFixed(2)  : '—';
-    document.getElementById('stat-min').textContent  = validMin.length  ? Math.min(...validMin).toFixed(2)  : '—';
-    document.getElementById('stat-n').textContent    = rows.length;
-
-    const color = '0,102,204';
-
-    const datasets = [
-        {
-            label: 'Max',
-            data: maxVals,
-            borderColor: `rgba(${color},0.25)`,
-            borderWidth: 1,
-            borderDash: [4, 3],
-            pointRadius: 0,
-            fill: 1,
-            backgroundColor: `rgba(${color},0.10)`,
-            order: 3,
-        },
-        {
-            label: 'Min',
-            data: minVals,
-            borderColor: `rgba(${color},0.25)`,
-            borderWidth: 1,
-            borderDash: [4, 3],
-            pointRadius: 0,
-            fill: false,
-            order: 3,
-        },
-        {
-            label: 'Media',
-            data: meanVals,
-            borderColor: `rgba(${color},1)`,
-            borderWidth: 2,
-            pointRadius: 0,
-            fill: false,
-            order: 1,
-            tension: 0.3,
-        },
-    ];
+    // Datasets
+    const datasets = [];
+    if (single) {
+        const s = active[0];
+        const c = colorOf(s);
+        datasets.push({
+            label: 'Max', data: rows.map(r => r[`${s}_max`]),
+            borderColor: `rgba(${c},0.25)`, borderWidth: 1, borderDash: [4, 3],
+            pointRadius: 0, fill: 1, backgroundColor: `rgba(${c},0.10)`, order: 3,
+        });
+        datasets.push({
+            label: 'Min', data: rows.map(r => r[`${s}_min`]),
+            borderColor: `rgba(${c},0.25)`, borderWidth: 1, borderDash: [4, 3],
+            pointRadius: 0, fill: false, order: 3,
+        });
+        datasets.push({
+            label: meta.sensors[s], data: rows.map(r => r[`${s}_mean`]),
+            borderColor: `rgba(${c},1)`, borderWidth: 2,
+            pointRadius: 0, fill: false, order: 1, tension: 0.3,
+        });
+    } else {
+        for (const s of active) {
+            const c = colorOf(s);
+            datasets.push({
+                label: meta.sensors[s], data: rows.map(r => r[`${s}_mean`]),
+                borderColor: `rgba(${c},1)`, borderWidth: 2,
+                pointRadius: 0, fill: false, order: 1, tension: 0.3,
+            });
+        }
+    }
 
     if (chart) {
         chart.data.labels = labels;
@@ -373,59 +407,48 @@ function updateChart() {
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: {
-                        labels: {
-                            filter: item => item.text === 'Media',
-                        }
+                        labels: { filter: item => item.text !== 'Max' && item.text !== 'Min' }
                     },
                     tooltip: {
                         callbacks: {
                             title: ctx => ctx[0].label,
                             label: ctx => {
-                                const names = { Max: 'Max', Min: 'Min', Media: 'Media' };
-                                return `${names[ctx.dataset.label]}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(2) + ' °C' : '—'}`;
+                                const v = ctx.parsed.y;
+                                if (v == null) return null;
+                                return `${ctx.dataset.label}: ${v.toFixed(2)} °C`;
                             }
                         }
                     }
                 },
                 scales: {
-                    x: {
-                        ticks: {
-                            maxTicksLimit: 12,
-                            font: { size: 11 },
-                        },
-                        grid: { color: '#eee' },
-                    },
+                    x: { ticks: { maxTicksLimit: 12, font: { size: 11 } }, grid: { color: '#eee' } },
                     y: {
                         title: { display: true, text: 'Temperatura (°C)', font: { size: 11 } },
-                        grid: { color: '#eee' },
-                        ticks: { font: { size: 11 } },
+                        grid: { color: '#eee' }, ticks: { font: { size: 11 } },
                     }
                 }
             }
         });
     }
 
-    // Aggiorna tabella se visibile
     if (document.getElementById('table-wrap').style.display !== 'none') {
-        renderTable(rows, sensor);
+        renderTable(rows, active);
     }
 }
 
-function renderTable(rows, sensor) {
+function renderTable(rows, active) {
     const thead = document.getElementById('table-head');
     const tbody = document.getElementById('table-body');
-    thead.innerHTML = `<tr>
-        <th>Data</th>
-        <th>Media (°C)</th>
-        <th>Max (°C)</th>
-        <th>Min (°C)</th>
-    </tr>`;
-    tbody.innerHTML = rows.map(r => `<tr>
-        <td>${r.date}</td>
-        <td>${r[`${sensor}_mean`] ?? '—'}</td>
-        <td>${r[`${sensor}_max`]  ?? '—'}</td>
-        <td>${r[`${sensor}_min`]  ?? '—'}</td>
-    </tr>`).join('');
+    thead.innerHTML = '<tr><th>Data</th>' +
+        active.map(s => `<th>${meta.sensors[s]} media (°C)</th><th>max (°C)</th><th>min (°C)</th>`).join('') +
+        '</tr>';
+    tbody.innerHTML = rows.map(r =>
+        '<tr><td>' + r.date + '</td>' +
+        active.map(s =>
+            `<td>${r[`${s}_mean`] ?? '—'}</td><td>${r[`${s}_max`] ?? '—'}</td><td>${r[`${s}_min`] ?? '—'}</td>`
+        ).join('') +
+        '</tr>'
+    ).join('');
 }
 
 function toggleTable() {
@@ -434,36 +457,28 @@ function toggleTable() {
     const visible = wrap.style.display !== 'none';
     wrap.style.display = visible ? 'none' : 'block';
     btn.textContent = (visible ? '▶' : '▼') + ' ' + (visible ? 'Mostra' : 'Nascondi') + ' dati tabellari';
-    if (!visible) {
-        renderTable(filterData(), document.getElementById('sensor-select').value);
-    }
+    if (!visible) renderTable(filterData(), getActiveSensors());
 }
 
 function downloadCSV() {
-    const sensor = document.getElementById('sensor-select').value;
-    const sensorLabel = document.getElementById('sensor-select').options[document.getElementById('sensor-select').selectedIndex].text;
-    const rows = filterData();
-    const from = document.getElementById('date-from').value;
-    const to   = document.getElementById('date-to').value;
-
-    const lines = [
+    const active = getActiveSensors();
+    const rows   = filterData();
+    const from   = document.getElementById('date-from').value;
+    const to     = document.getElementById('date-to').value;
+    const lines  = [
         `# Stazione: ${meta.name} (${meta.station_id})`,
-        `# Sensore: ${sensorLabel}`,
+        `# Sensori: ${active.map(s => meta.sensors[s]).join(', ')}`,
         `# Periodo: ${from} / ${to}`,
-        'Data,Media (°C),Max (°C),Min (°C)',
-        ...rows.map(r => [
-            r.date,
-            r[`${sensor}_mean`] ?? '',
-            r[`${sensor}_max`]  ?? '',
-            r[`${sensor}_min`]  ?? ''
-        ].join(','))
+        ['Data', ...active.flatMap(s => [`${meta.sensors[s]} media (°C)`, 'max (°C)', 'min (°C)'])].join(','),
+        ...rows.map(r =>
+            [r.date, ...active.flatMap(s => [r[`${s}_mean`] ?? '', r[`${s}_max`] ?? '', r[`${s}_min`] ?? ''])].join(',')
+        )
     ];
-
     const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `UCC_${meta.station_id}_${sensor}_${from}_${to}.csv`;
+    a.href = url;
+    a.download = `UCC_${meta.station_id}_${active.join('-')}_${from}_${to}.csv`;
     a.click();
     URL.revokeObjectURL(url);
 }

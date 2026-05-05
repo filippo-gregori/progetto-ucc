@@ -2,7 +2,10 @@
   "station_id": "FVG-01",
   "name": "Grotta delle Torri di Slivia",
   "sensors": {
-    "air1": "T aria UCC"
+    "air1":  "T aria UCC",
+    "ext":   "T esterna",
+    "rock":  "T roccia",
+    "water": "T acqua"
   },
   "date_min": "2025-03-30",
   "date_max": "2026-03-01"
